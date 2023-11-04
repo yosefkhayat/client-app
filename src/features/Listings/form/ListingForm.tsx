@@ -1,14 +1,13 @@
 ﻿import React, { ChangeEvent, useState } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
-import { Listing } from '../../../app/models/listing';
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
-interface Props {
-    listing: Listing | undefined;
-    closeForm: () => void;
-    createOrEdit: (listing: Listing) => void;
-}
+export default observer(function ListingForm() {
+    const { listingStore } = useStore();
+    const { selectedListing, closeForm, createListing, updateListing, loading } = listingStore;
 
-export default function ListingForm({ listing:selectedListing, closeForm, createOrEdit }: Props) {
+
     const initailState = selectedListing ?? {
         id: '',
         address: '',
@@ -22,7 +21,7 @@ export default function ListingForm({ listing:selectedListing, closeForm, create
 
     const [listing, setListing] = useState(initailState);
     function handleSubmit() {
-        createOrEdit(listing);
+        listing.id ? updateListing(listing) : createListing(listing);
     }
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
@@ -39,10 +38,10 @@ export default function ListingForm({ listing:selectedListing, closeForm, create
                 <Form.Input placeholder='region' value={listing.region} name='region' onChange={handleInputChange} />
                 <Form.Input placeholder='price' value={listing.price} name='price' onChange={handleInputChange} />
                 <Form.Input placeholder='area' value={listing.area} name='area' onChange={handleInputChange} />
-                <Button floated='right' positive type='submit' content='Submit' />
+                <Button loading={loading} floated='right' positive type='submit' content='Submit' />
                 <Button onClick={closeForm} floated='right' tyoe='button' content='Cancel' />
             </Form>
         </Segment>
 
     )
-}
+})

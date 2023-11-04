@@ -1,15 +1,15 @@
 ﻿import React from 'react';
 import { Button, Card, Icon, Image } from 'semantic-ui-react';
 import logo from '../dashboard/image.png';
-import { Listing } from '../../../app/models/listing';
+import { useStore } from '../../../app/stores/store';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 
-interface Props {
-    listing: Listing;
-    cancelSelectListing: () => void;
-    openForm: (id: string) => void;
-}
 
-export default function ListingDetails({ listing, cancelSelectListing, openForm }: Props) {
+export default function ListingDetails() {
+    const { listingStore } = useStore();
+    const { selectedListing: listing, openForm, cancelSelectedListing } = listingStore;
+    if (!listing) return <LoadingComponent/>;
+
     return (
         <Card fluid>
             <Image src={logo} wrapped ui={false} />
@@ -30,7 +30,7 @@ export default function ListingDetails({ listing, cancelSelectListing, openForm 
             <Card.Content extra textAlign="center">
                 <Button.Group widths='2'>
                     <Button onClick={() => openForm(listing.id)} basic color='blue' content='Edit' />
-                    <Button onClick={cancelSelectListing} basic color='grey' content='Cancel' />
+                    <Button onClick={cancelSelectedListing} basic color='grey' content='Cancel' />
                 </Button.Group>
             </Card.Content>
         </Card>

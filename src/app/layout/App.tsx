@@ -1,69 +1,27 @@
 import { Container } from 'semantic-ui-react';
 import NavBar from './NavBar';
 import ListingDashboard from '../../features/Listings/dashboard/ListingDashboard';
-import { Listing } from '../models/listing';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { v4 as uuid } from 'uuid';
+import { useEffect } from 'react';
+import LoadingComponent from './LoadingComponent';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../stores/store';
 
 function App() {
-    const [listings, setListings] = useState<Listing[]>([]);
-    const [selectedListing, setSelectedListing] = useState<Listing | undefined>(undefined);
-    const [editMode, setEditMode] = useState(false);
+    const { listingStore } = useStore();
 
     useEffect(() => {
-        axios.get<Listing[]>('http://localhost:5063/api/Listings').then(response => {
-            setListings(response.data);
-        })
-    }, []);
+        listingStore.loadListings();
+    }, [listingStore]);
 
-    function handleSelectListing(id: string) {
-        setSelectedListing(listings.find(x => x.id === id));
-}
-    function handleCancelSelectlisting() {
-        setSelectedListing(undefined);
-    }
-
-    function handelFormOpen(id?: string) {
-        id ? handleSelectListing(id) : handleCancelSelectlisting();
-        setEditMode(true);
-    }
-
-    function handleFormClose() {
-        setEditMode(false);
-    }
-
-    function handleCreateOrEditListing(listing: Listing) {
-        listing.id
-            ? setListings([...listings.filter(x => x.id !== listing.id), listing])
-            : setListings([...listings, { ...listing, id:uuid()}]);
-        setEditMode(false);
-        setSelectedListing(listing);
-    }
-    function handleDeleteListing(id: string) {
-        setListings([...listings.filter(x=>x.id !== id)])
-    }
-
-    
+    if (listingStore.loadingInitial) return <LoadingComponent content='loading app ' />
 
     return (
         <>
-            <NavBar openForm={handelFormOpen} />
+            <NavBar />
             <Container style={{marginTop:'7em'} }>
-                <ListingDashboard
-                    listings={listings}
-                    selectedListing={selectedListing}
-                    selectListing={handleSelectListing}
-                    cancelSelectListing={handleCancelSelectlisting}
-                    editMode={editMode}
-                    openForm={handelFormOpen}
-                    closeForm={handleFormClose}
-                    createOrEdit={handleCreateOrEditListing}
-                    deleteListing={handleDeleteListing}
-                />
+                <ListingDashboard/>
             </Container>
         </>
     );
 }
-
-export default App;
+export default observer(App);
