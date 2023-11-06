@@ -1,14 +1,22 @@
-﻿import React from 'react';
+﻿import React, { useEffect } from 'react';
 import { Button, Card, Icon, Image } from 'semantic-ui-react';
 import logo from '../dashboard/image.png';
 import { useStore } from '../../../app/stores/store';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
+import { Link, useParams } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 
 
-export default function ListingDetails() {
+export default observer( function ListingDetails() {
     const { listingStore } = useStore();
-    const { selectedListing: listing, openForm, cancelSelectedListing } = listingStore;
-    if (!listing) return <LoadingComponent/>;
+    const { selectedListing: listing, loadListing, loadingInitial } = listingStore;
+    const { id } = useParams<{ id: string }>();
+
+    useEffect(() => {
+        if (id) loadListing(id);
+    }, [id, loadListing])
+
+    if (loadingInitial || !listing) return <LoadingComponent/>;
 
     return (
         <Card fluid>
@@ -29,10 +37,10 @@ export default function ListingDetails() {
              </Card.Content>
             <Card.Content extra textAlign="center">
                 <Button.Group widths='2'>
-                    <Button onClick={() => openForm(listing.id)} basic color='blue' content='Edit' />
-                    <Button onClick={cancelSelectedListing} basic color='grey' content='Cancel' />
+                    <Button as={Link} to={`/manage/${listing.id}`} basic color='blue' content='Edit' />
+                    <Button as={Link} to='/listings' basic color='grey' content='Cancel' />
                 </Button.Group>
             </Card.Content>
         </Card>
     )
-}
+})

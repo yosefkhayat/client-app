@@ -1,26 +1,35 @@
 import { Container } from 'semantic-ui-react';
 import NavBar from './NavBar';
-import ListingDashboard from '../../features/Listings/dashboard/ListingDashboard';
-import { useEffect } from 'react';
-import LoadingComponent from './LoadingComponent';
 import { observer } from 'mobx-react-lite';
-import { useStore } from '../stores/store';
+import { Route, useLocation } from 'react-router-dom';
+import HomePage from '../../features/home/HomePage';
+import ListingDashboard from '../../features/Listings/dashboard/ListingDashboard';
+import ListingForm from '../../features/Listings/form/ListingForm';
+import ListingDetails from '../../features/Listings/details/ListingDetails';
+import React from 'react';
+
 
 function App() {
-    const { listingStore } = useStore();
-
-    useEffect(() => {
-        listingStore.loadListings();
-    }, [listingStore]);
-
-    if (listingStore.loadingInitial) return <LoadingComponent content='loading app ' />
+    const  location = useLocation();
 
     return (
         <>
-            <NavBar />
-            <Container style={{marginTop:'7em'} }>
-                <ListingDashboard/>
-            </Container>
+            <Route exact path='/' component={HomePage} />
+            <Route
+                path={'/(.+)'}
+                render={() => (
+                    <>
+                        <NavBar />
+                        <Container style={{ marginTop: '7em' }} >
+                            <Route exact path='/listings' component={ListingDashboard} />
+                            <Route path='/listings/:id' component={ListingDetails} />
+                            <Route key={location.key} path={['/createListing', '/manage/:id']} component={ListingForm} />
+                        </Container>
+                    </>
+
+                )}
+                />
+            
         </>
     );
 }

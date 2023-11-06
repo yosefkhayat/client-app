@@ -3,6 +3,7 @@ import React, { SyntheticEvent, useState } from 'react';
 import logo from './image.png';
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
+import { Link } from "react-router-dom";
 
 
 export default observer(function ListingList() {
@@ -25,7 +26,7 @@ export default observer(function ListingList() {
                         <Item.Content verticalAlign='middle'>
                             <Item.Header as='a'>{listing.address}, {listing.city}</Item.Header>
                             <Item.Content>
-                                <Button onClick={() => listingStore.selectListing(listing.id)} floated='right' content='View' color='blue' />
+                                <Button as={Link} to={`/listings/${listing.id}`} floated='right' content='View' color='blue' />
                                 <Button
                                     name={listing.id}
                                     loading={loading && target === listing.id}
