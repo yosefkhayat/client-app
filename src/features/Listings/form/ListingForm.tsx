@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid'
 export default observer(function ListingForm() {
     const history = useHistory();
     const { listingStore } = useStore();
-    const { selectedListing, createListing, updateListing, loading, loadListing, loadingInitial } = listingStore;
+    const {  createListing, updateListing, loading, loadListing, loadingInitial } = listingStore;
     const { id } = useParams<{ id: string }>();
 
     const [listing, setListing] = useState({
@@ -56,6 +56,7 @@ export default observer(function ListingForm() {
                 <Form.Input placeholder='region' value={listing.region} name='region' onChange={handleInputChange} />
                 <Form.Input placeholder='price' value={listing.price} name='price' onChange={handleInputChange} />
                 <Form.Input placeholder='area' value={listing.area} name='area' onChange={handleInputChange} />
+                <Form.Input placeholder='postal code' value={listing.postalCode} name='postalCode' onChange={handleInputChange} />
                 <Button loading={loading} floated='right' positive type='submit' content='Submit' />
                 <Button as={Link} to='/listings' floated='right' tyoe='button' content='Cancel' />
             </Form>

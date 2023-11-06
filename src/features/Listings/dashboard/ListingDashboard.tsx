@@ -4,6 +4,7 @@ import ListingList from './ListingList';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
+import ListingFilter from './ListingFilters';
 
 
 
@@ -24,7 +25,7 @@ export default observer(function ListingDashboard() {
                 <ListingList />
             </Grid.Column>
             <Grid.Column width='6'>
-               
+                <ListingFilter/>
             </Grid.Column>
         </Grid>
     )

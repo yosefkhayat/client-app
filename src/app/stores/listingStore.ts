@@ -14,7 +14,22 @@ export default class ListingStore {
     }
 
     get listingByDate() {
-        return Array.from(this.listingRegistry.values());
+        return Array.from(this.listingRegistry.values()).sort((a, b) =>
+            Date.parse(a.dateTime.toString()) - Date.parse(b.dateTime.toString()));
+    }
+    get listingByCity() {
+        return Array.from(this.listingRegistry.values()).sort((a, b) =>
+            a.city.localeCompare(b.city));
+    }
+    
+    get groupedListings() {
+        return Object.entries(
+            this.listingByCity.reduce((listings, listing) => {
+                const city = listing.city;
+                listings[city] = listings[city] ? [...listings[city], listing] : [listing];
+                return listings;
+            }, {} as {[key: string]: Listing[]})
+        )
     }
 
     loadListings = async () => {
