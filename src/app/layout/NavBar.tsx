@@ -17,6 +17,10 @@ export default function NavBar() {
                 as={NavLink} to='/listings'
                 name='Listings'
             />
+            <Menu.Item
+                as={NavLink} to='/errors'
+                name='Errors'
+            />cd c
             <Menu.Item>
                 <Button as={NavLink} to='/createListing' primary content='Create Listing' />
             </Menu.Item>

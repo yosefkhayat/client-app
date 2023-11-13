@@ -3,18 +3,23 @@ import ReactDOM from 'react-dom/client';
 import './app/layout/styles.css';
 import 'semantic-ui-css/semantic.min.css'
 import App from './app/layout/App';
+import 'react-toastify/dist/ReactToastify.min.css';
 import reportWebVitals from './reportWebVitals';
 import { StoreContext, store } from './app/stores/store';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+
+export const history = createBrowserHistory();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
     <StoreContext.Provider value={store}>
-        <BrowserRouter>
-            <App />  
-        </BrowserRouter>
+
+            <Router history={history}>
+                <App />  
+            </Router>
         
     </StoreContext.Provider>
     
