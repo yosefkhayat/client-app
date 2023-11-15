@@ -7,7 +7,7 @@ export default class ListingStore {
     selectedListing: Listing | undefined = undefined;
     editMode = false;
     loading = false;
-    loadingInitial = true;
+    loadingInitial = false;
 
     constructor() {
         makeAutoObservable(this)
@@ -15,7 +15,7 @@ export default class ListingStore {
 
     get listingByDate() {
         return Array.from(this.listingRegistry.values()).sort((a, b) =>
-            Date.parse(a.dateTime.toString()) - Date.parse(b.dateTime.toString()));
+            a.dateTime!.getTime() - b.dateTime!.getTime());
     }
     get listingByCity() {
         return Array.from(this.listingRegistry.values()).sort((a, b) =>
@@ -71,6 +71,7 @@ export default class ListingStore {
     }
 
     private setListing = (listing: Listing) => {
+        listing.dateTime = new Date(listing.dateTime!);
         this.listingRegistry.set(listing.id, listing);
     }
 

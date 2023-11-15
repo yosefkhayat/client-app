@@ -2,6 +2,7 @@
 import React from 'react'
 import { Segment, Grid, Icon } from 'semantic-ui-react'
 import { Listing } from '../../../app/models/listing';
+import { format } from 'date-fns';
 
 interface Props {
     listing: Listing
@@ -27,7 +28,7 @@ export default observer(function ActivityDetailedInfo({ listing }: Props) {
                     </Grid.Column>
                     <Grid.Column width={15}>
                         <span>
-                            {listing.dateTime.toString()}
+                            {format( listing.dateTime!,'dd MMM yyyy h:mm aa')}
                         </span>
                     </Grid.Column>
                 </Grid>

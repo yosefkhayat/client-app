@@ -1,10 +1,17 @@
-﻿import React, { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Form, Segment } from 'semantic-ui-react';
+﻿import React, {  useEffect, useState } from 'react';
+import { Button, Header, Segment } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { v4 as uuid } from 'uuid'
+import { Formik, Form} from 'formik';
+import * as Yup from 'yup';
+import MyTextInput from '../../../app/common/form/MyTextInput';
+import MySelectInput from '../../../app/common/form/MySelectInput';
+import { regionOptions } from '../../../app/common/options/regionOptions';
+import MyDateInput from '../../../app/common/form/MyDateInput';
+import { Listing } from '../../../app/models/listing';
 
 export default observer(function ListingForm() {
     const history = useHistory();
@@ -12,22 +19,32 @@ export default observer(function ListingForm() {
     const {  createListing, updateListing, loading, loadListing, loadingInitial } = listingStore;
     const { id } = useParams<{ id: string }>();
 
-    const [listing, setListing] = useState({
+    const [listing, setListing] = useState < Listing>({
         id: '',
         address: '',
         city: '',
         area: 0,
-        dateTime: new Date(),
+        dateTime: null,
         postalCode: '',
-        price: 0,
+        price:0 ,
         region: ''
     });
+
+    const validationSchema = Yup.object({
+        address: Yup.string().required('The listing adress is required!'),
+        city: Yup.string().required('The listing city is required!'),
+        region: Yup.string().required('The listing region is required!'),
+        price: Yup.number().required(),
+        area: Yup.number().required(),
+        postalCode: Yup.string().required('The listing postal code is required!'),
+        dateTime: Yup.string().required().nullable()
+    })
 
     useEffect(() => {
         if (id) loadListing(id).then(listing => setListing(listing!))
     }, [id, loadListing]);
     
-    function handleSubmit() {
+    function handleFormSubmit(listing : Listing) {
         if (listing.id.length === 0) {
             let newListing = {
                 ...listing,
@@ -39,27 +56,45 @@ export default observer(function ListingForm() {
         }
     }
 
-    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-        const { name, value } = event.target;
-        setListing({ ...listing, [name]: value })
-
-    }
-
+  
     if (loadingInitial) return <LoadingComponent content='Loading listing...'/>
 
     return (
 
         <Segment clearing>
-            <Form onSubmit={handleSubmit} autoComplete='off'>
-                <Form.Input placeholder='address' value={listing.address} name='address' onChange={handleInputChange} />
-                <Form.Input placeholder='city' value={listing.city} name='city' onChange={handleInputChange} />
-                <Form.Input placeholder='region' value={listing.region} name='region' onChange={handleInputChange} />
-                <Form.Input placeholder='price' value={listing.price} name='price' onChange={handleInputChange} />
-                <Form.Input placeholder='area' value={listing.area} name='area' onChange={handleInputChange} />
-                <Form.Input placeholder='postal code' value={listing.postalCode} name='postalCode' onChange={handleInputChange} />
-                <Button loading={loading} floated='right' positive type='submit' content='Submit' />
-                <Button as={Link} to='/listings' floated='right' tyoe='button' content='Cancel' />
-            </Form>
+            <Header content='Listing Details' sub color='teal'/>
+            <Formik
+                validationSchema={validationSchema}
+                enableReinitialize
+                initialValues={listing}
+                onSubmit={values => handleFormSubmit(values)}>
+                {({ handleSubmit, isValid, isSubmitting,dirty }) => (
+                    <Form className='ui form ' onSubmit={handleSubmit} autoComplete='off'>
+                        <MyTextInput placeholder='Address' name='address' />
+                        <MyTextInput placeholder='city' name='city' />
+                        <MySelectInput options={regionOptions} placeholder='region' name='region' />
+                        <MyTextInput placeholder='price' name='price' />
+                        <MyTextInput placeholder='area' name='area' />
+                        <MyDateInput
+                            placeholderText='Date'
+                            name='dateTime'
+                            showTimeSelect
+                            timeCaption='time'
+                            dateFormat='MMMM d, yyyy h:mm aa '
+
+                        />
+                        <MyTextInput placeholder='postal code' name='postalCode' />
+                        <Header content='Description Details will go here' sub color='teal' />
+                        <Button
+                            disabled={isSubmitting || !dirty || !isValid}
+                            loading={loading}
+                            floated='right'
+                            positive type='submit' content='Submit' />
+                        <Button as={Link} to='/listings' floated='right' tyoe='button' content='Cancel' />
+                    </Form>
+                )}
+            </Formik>
+            
         </Segment>
 
     )

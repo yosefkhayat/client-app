@@ -6,5 +6,5 @@
     postalCode: string;
     price:      number;
     area:       number;
-    dateTime:   Date;
+    dateTime:   Date | null;
 }

@@ -3,6 +3,7 @@ import React from 'react'
 import { Button, Header, Item, Segment, Image } from 'semantic-ui-react'
 import logo from '../dashboard/image.png';
 import { Listing } from '../../../app/models/listing';
+import { Link } from 'react-router-dom';
 
 const listingImageStyle = {
     filter: 'brightness(30%)'
@@ -47,7 +48,7 @@ export default observer(function ActivityDetailedHeader({ listing }: Props) {
             <Segment clearing attached='bottom'>
                 <Button color='teal'>Request vist </Button>
                 <Button>Cancel Request</Button>
-                <Button color='orange' floated='right'>
+                <Button as={Link} to={`/manage/${listing.id}`} color='orange' floated='right'>
                     Manage Listing
                 </Button>
             </Segment>
