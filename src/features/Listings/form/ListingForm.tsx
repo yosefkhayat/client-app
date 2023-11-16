@@ -12,6 +12,7 @@ import MySelectInput from '../../../app/common/form/MySelectInput';
 import { regionOptions } from '../../../app/common/options/regionOptions';
 import MyDateInput from '../../../app/common/form/MyDateInput';
 import { Listing } from '../../../app/models/listing';
+import MyTextArea from '../../../app/common/form/MyTextArea';
 
 export default observer(function ListingForm() {
     const history = useHistory();
@@ -27,7 +28,8 @@ export default observer(function ListingForm() {
         dateTime: null,
         postalCode: '',
         price:0 ,
-        region: ''
+        region: '',
+        description:''
     });
 
     const validationSchema = Yup.object({
@@ -71,10 +73,10 @@ export default observer(function ListingForm() {
                 {({ handleSubmit, isValid, isSubmitting,dirty }) => (
                     <Form className='ui form ' onSubmit={handleSubmit} autoComplete='off'>
                         <MyTextInput placeholder='Address' name='address' />
-                        <MyTextInput placeholder='city' name='city' />
+                        <MyTextInput placeholder='City' name='city' />
                         <MySelectInput options={regionOptions} placeholder='region' name='region' />
-                        <MyTextInput placeholder='price' name='price' />
-                        <MyTextInput placeholder='area' name='area' />
+                        <MyTextInput placeholder='Price' name='price' />
+                        <MyTextInput placeholder='Area' name='area' />
                         <MyDateInput
                             placeholderText='Date'
                             name='dateTime'
@@ -85,6 +87,7 @@ export default observer(function ListingForm() {
                         />
                         <MyTextInput placeholder='postal code' name='postalCode' />
                         <Header content='Description Details will go here' sub color='teal' />
+                        <MyTextArea rows={3} placeholder='Description' name='description' />
                         <Button
                             disabled={isSubmitting || !dirty || !isValid}
                             loading={loading}
