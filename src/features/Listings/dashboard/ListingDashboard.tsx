@@ -17,7 +17,7 @@ export default observer(function ListingDashboard() {
         if (listingRegistry.size<=1) loadListings();
     }, [listingRegistry.size, loadListings]);
 
-    if (listingStore.loadingInitial) return <LoadingComponent content='loading app ' />
+    if (listingStore.loadingInitial) return <LoadingComponent content='loading Listings ' />
 
     return (
         <Grid>
