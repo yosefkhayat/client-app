@@ -34,7 +34,7 @@ export default function ListingListItem({ listing }: Props) {
                 </span>
             </Segment>
             <Segment secondary>
-                Description will go here
+                {listing.description}
             </Segment>
             <Segment clearing>
                 <Button
