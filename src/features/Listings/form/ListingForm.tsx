@@ -11,26 +11,16 @@ import MyTextInput from '../../../app/common/form/MyTextInput';
 import MySelectInput from '../../../app/common/form/MySelectInput';
 import { regionOptions } from '../../../app/common/options/regionOptions';
 import MyDateInput from '../../../app/common/form/MyDateInput';
-import { Listing } from '../../../app/models/listing';
+import { ListingFormValues } from '../../../app/models/listing';
 import MyTextArea from '../../../app/common/form/MyTextArea';
 
 export default observer(function ListingForm() {
     const history = useHistory();
     const { listingStore } = useStore();
-    const {  createListing, updateListing, loading, loadListing, loadingInitial } = listingStore;
+    const {  createListing, updateListing, loadListing, loadingInitial } = listingStore;
     const { id } = useParams<{ id: string }>();
 
-    const [listing, setListing] = useState < Listing>({
-        id: '',
-        address: '',
-        city: '',
-        area: 0,
-        dateTime: null,
-        postalCode: '',
-        price:0 ,
-        region: '',
-        description:''
-    });
+    const [listing, setListing] = useState<ListingFormValues>(new ListingFormValues());
 
     const validationSchema = Yup.object({
         address: Yup.string().required('The listing adress is required!'),
@@ -43,11 +33,11 @@ export default observer(function ListingForm() {
     })
 
     useEffect(() => {
-        if (id) loadListing(id).then(listing => setListing(listing!))
+        if (id) loadListing(id).then(listing => setListing(new ListingFormValues(listing)))
     }, [id, loadListing]);
     
-    function handleFormSubmit(listing : Listing) {
-        if (listing.id.length === 0) {
+    function handleFormSubmit(listing: ListingFormValues) {
+        if (!listing.id) {
             let newListing = {
                 ...listing,
                 id: uuid()
@@ -90,7 +80,7 @@ export default observer(function ListingForm() {
                         <MyTextArea rows={3} placeholder='Description' name='description' />
                         <Button
                             disabled={isSubmitting || !dirty || !isValid}
-                            loading={loading}
+                            loading={isSubmitting}
                             floated='right'
                             positive type='submit' content='Submit' />
                         <Button as={Link} to='/listings' floated='right' tyoe='button' content='Cancel' />

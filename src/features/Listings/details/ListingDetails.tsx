@@ -29,7 +29,7 @@ export default observer( function ListingDetails() {
                 <ListingDetailedChat />
             </Grid.Column>
             <Grid.Column width={6}>
-                <ListingDetailedSidebar/>
+                <ListingDetailedSidebar listing={listing} />
             </Grid.Column>
         </Grid>
     )

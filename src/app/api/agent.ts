@@ -1,5 +1,5 @@
 ﻿import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Listing } from '../models/listing';
+import { Listing, ListingFormValues } from '../models/listing';
 import { toast } from 'react-toastify';
 import { history } from '../..';
 import { store } from '../stores/store';
@@ -71,9 +71,10 @@ const requests = {
 const Listings = {
     list: () => requests.get<Listing[]>('/listings'),
     details: (id: string) => requests.get<Listing>(`/listings/${id}`),
-    create: (listing: Listing) => axios.post<void>('/listings', listing),
-    update: (listing: Listing) => axios.put<void>(`/listings/${listing.id}`, listing),
-    delete: (id: string) => axios.delete<void>(`/listings/${id}`)
+    create: (listing: ListingFormValues) => requests.post<void>('/listings', listing),
+    update: (listing: ListingFormValues) => requests.put<void>(`/listings/${listing.id}`, listing),
+    delete: (id: string) => requests.del<void>(`/listings/${id}`),
+    visit: (id: string) => requests.post<void>(`/listings/${id}/visit`, {})
 }
 
 const Account = {

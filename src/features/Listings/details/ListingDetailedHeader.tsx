@@ -1,9 +1,10 @@
 ﻿import { observer } from 'mobx-react-lite';
 import React from 'react'
-import { Button, Header, Item, Segment, Image } from 'semantic-ui-react'
+import { Button, Header, Item, Segment, Image, Label } from 'semantic-ui-react'
 import logo from '../dashboard/image.png';
 import { Listing } from '../../../app/models/listing';
 import { Link } from 'react-router-dom';
+import { useStore } from '../../../app/stores/store';
 
 const listingImageStyle = {
     filter: 'brightness(30%)'
@@ -23,9 +24,14 @@ interface Props {
 }
 
 export default observer(function ActivityDetailedHeader({ listing }: Props) {
+    const { listingStore: { updateVisitor, loading,cancelVisitaionToggle } } = useStore();
     return (
         <Segment.Group>
             <Segment basic attached='top' style={{ padding: '0' }}>
+                {listing.isCancelled &&
+                    <Label style={{ position: 'absolute', zIndex: 1000, left: -14, top: 20 }}
+                        ribbon color='red' content='On Hold' />
+                }
                 <Image src={logo} fluid style={listingImageStyle} />
                 <Segment style={listingImageTextStyle} basic>
                     <Item.Group>
@@ -46,11 +52,38 @@ export default observer(function ActivityDetailedHeader({ listing }: Props) {
                 </Segment>
             </Segment>
             <Segment clearing attached='bottom'>
-                <Button color='teal'>Request vist </Button>
-                <Button>Cancel Request</Button>
-                <Button as={Link} to={`/manage/${listing.id}`} color='orange' floated='right'>
-                    Manage Listing
-                </Button>
+
+                {listing.isCreator ? (
+                    <>
+                        <Button
+                            color={listing.isCancelled ? 'green' : 'red'}
+                            floted='left'
+                            basic
+                            content={listing.isCancelled ? 'Re-active Visitation' : 'Cancel Visitation'}
+                            onClick={cancelVisitaionToggle}
+                            loading={loading}
+                            />
+                        <Button
+                            disabled={listing.isCancelled}
+                            as={Link} to={`/manage/${listing.id}`}
+                            color='orange'
+                            floated='right'>
+                            Manage Listing
+                        </Button>
+
+
+                    
+                    </>                ) : listing.isVisiting ? (
+                    <Button loading={loading} onClick={updateVisitor}>Cancel Request</Button>
+                    ) : (
+                            <Button
+                                disabled={listing.isCancelled}
+                                loading={loading}
+                                onClick={updateVisitor}
+                                color='teal'>
+                                Request vist
+                            </Button>
+                )}
             </Segment>
         </Segment.Group>
     )

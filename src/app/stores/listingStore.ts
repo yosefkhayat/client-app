@@ -1,6 +1,8 @@
 ﻿import { makeAutoObservable, runInAction } from "mobx";
-import { Listing } from "../models/listing";
+import { Listing, ListingFormValues } from "../models/listing";
 import agent from "../api/agent";
+import { store } from "./store";
+import { Profile } from "../models/profile";
 
 export default class ListingStore {
     listingRegistry = new Map<string, Listing>();
@@ -71,6 +73,14 @@ export default class ListingStore {
     }
 
     private setListing = (listing: Listing) => {
+        const user = store.userStore.user;
+        if (user) {
+            listing.isVisiting = listing.visitors!.some(
+                a => a.username === user.username
+            )
+            listing.isCreator = listing.creatorUsername === user.username;
+            listing.creator = listing.visitors?.find(x => x.username === listing.creatorUsername);
+        }
         listing.dateTime = new Date(listing.dateTime!);
         this.listingRegistry.set(listing.id, listing);
     }
@@ -83,15 +93,17 @@ export default class ListingStore {
         this.loadingInitial = state;
     }
 
-    createListing = async (listing: Listing) => {
-        this.loading = true;
+    createListing = async (listing: ListingFormValues) => {
+        const user = store.userStore.user;
+        const visitor = new Profile(user!);
         try {
             await agent.Listings.create(listing);
+            const newListing = new Listing(listing);
+            newListing.creatorUsername = user!.username;
+            newListing.visitors = [visitor];
+            this.setListing(newListing);
             runInAction(() => {
-                this.setListing(listing);
-                this.selectedListing = listing;
-                this.editMode = false;
-                this.loading = false;
+                this.selectedListing = newListing;
             })
         } catch (error) {
             console.log(error);
@@ -101,15 +113,16 @@ export default class ListingStore {
         }
     }
 
-    updateListing = async (listing: Listing) => {
-        this.loading = true;
+    updateListing = async (listing: ListingFormValues) => {
+
         try {
             await agent.Listings.update(listing);
             runInAction(() => {
-                this.setListing(listing);
-                this.selectedListing = listing;
-                this.editMode = false;
-                this.loading = false;
+                if (listing.id) {
+                    let updatedListing = { ...this.getListing(listing.id), ...listing };
+                    this.listingRegistry.set(listing.id, updatedListing as Listing);
+                    this.selectedListing = updatedListing as Listing;
+                }    
             })
         } catch (error) {
             console.log(error);
@@ -132,6 +145,45 @@ export default class ListingStore {
             runInAction(() => {
                 this.loading = false;
             })
+        }
+    }
+
+    updateVisitor = async () => {
+        const user = store.userStore.user;
+        this.loading = true;
+        try {
+            await agent.Listings.visit(this.selectedListing!.id);
+            runInAction(() => {
+                if (this.selectedListing?.isVisiting) {
+                    this.selectedListing.visitors =
+                        this.selectedListing.visitors?.filter(a => a.username !== user?.username);
+                    this.selectedListing.isVisiting = false;
+                } else {
+                    const visitor = new Profile(user!);
+                    this.selectedListing?.visitors?.push(visitor);
+                    this.selectedListing!.isVisiting = true;
+                }
+                this.listingRegistry.set(this.selectedListing!.id, this.selectedListing!);
+            })
+        } catch (error) {
+            console.log(error);
+        } finally {
+            runInAction(() => this.loading = false);
+        }
+    }
+
+    cancelVisitaionToggle = async () => {
+        this.loading = true;
+        try {
+            await agent.Listings.visit(this.selectedListing!.id);
+            runInAction(() => {
+                this.selectedListing!.isCancelled = !this.selectedListing?.isCancelled;
+                this.listingRegistry.set(this.selectedListing!.id, this.selectedListing!);
+            })
+        } catch (erro) {
+
+        } finally {
+            runInAction(() => this.loading = false);
         }
     }
 }
