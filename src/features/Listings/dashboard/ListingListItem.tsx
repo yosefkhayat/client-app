@@ -21,12 +21,12 @@ export default function ListingListItem({ listing }: Props) {
                 }
                 <Item.Group>
                     <Item>
-                        <Item.Image size='tiny' rounded src={logo} />
+                        <Item.Image size='tiny' rounded src={ listing.creator?.image || logo } />
                         <Item.Content>
                             <Item.Header as={Link} to={`/listings/${listing.id}`}>
                                 {listing.address}
                             </Item.Header>
-                                <Item.Description>postal:{listing.postalCode}, {listing.city} and created by {listing.creator?.displayName}</Item.Description>
+                            <Item.Description>postal:{listing.postalCode}, {listing.city} and created by <Link to={`/profiles/${listing.creatorUsername}`}>{listing.creator?.displayName}</Link> </Item.Description>
                                 {listing.isCreator && (
                                     <Item.Description>
                                         <Label basic color='orange'>

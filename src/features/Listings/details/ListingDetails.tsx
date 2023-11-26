@@ -12,12 +12,13 @@ import ListingDetailedSidebar from './ListingDetailedSidebar';
 
 export default observer( function ListingDetails() {
     const { listingStore } = useStore();
-    const { selectedListing: listing, loadListing, loadingInitial } = listingStore;
+    const { selectedListing: listing, loadListing, loadingInitial, clearSelectedListing } = listingStore;
     const { id } = useParams<{ id: string }>();
 
     useEffect(() => {
         if (id) loadListing(id);
-    }, [id, loadListing])
+        return () => clearSelectedListing();
+    }, [id, loadListing, clearSelectedListing])
 
     if (loadingInitial || !listing) return <LoadingComponent/>;
 
@@ -25,8 +26,8 @@ export default observer( function ListingDetails() {
         <Grid>
             <Grid.Column width={10}>
                 <ListingDetailedHeader listing={ listing } />
-                <ListingDetailedInfo listing={ listing } />
-                <ListingDetailedChat />
+                <ListingDetailedInfo listing={listing} />
+                <ListingDetailedChat listingId={listing.id} />
             </Grid.Column>
             <Grid.Column width={6}>
                 <ListingDetailedSidebar listing={listing} />

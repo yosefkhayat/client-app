@@ -186,4 +186,8 @@ export default class ListingStore {
             runInAction(() => this.loading = false);
         }
     }
+
+    clearSelectedListing = () => {
+        this.selectedListing = undefined;
+    }
 }
