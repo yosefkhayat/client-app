@@ -1,8 +1,9 @@
-﻿import { makeAutoObservable, runInAction } from "mobx";
+﻿import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { Listing, ListingFormValues } from "../models/listing";
 import agent from "../api/agent";
 import { store } from "./store";
 import { Profile } from "../models/profile";
+import { Pagination, PagingParams } from "../models/pagination";
 
 export default class ListingStore {
     listingRegistry = new Map<string, Listing>();
@@ -10,9 +11,57 @@ export default class ListingStore {
     editMode = false;
     loading = false;
     loadingInitial = false;
+    pagination: Pagination | null = null;
+    pagingParams = new PagingParams();
+    predicate = new Map().set('all', true);
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
+
+        reaction(
+            () => this.predicate.keys(),
+            () => {
+                this.pagingParams = new PagingParams();
+                this.listingRegistry.clear();
+                this.loadListings();
+            }
+        )
+    }
+
+    setPagingParams = (pagingParams: PagingParams) => {
+        this.pagingParams = pagingParams;
+    }
+
+    setPredicate = (predicate: string, value: string | Date) => {
+        const resetPredicate = () => {
+            this.predicate.forEach((value, key) => {
+                this.predicate.delete(key);
+            })
+        }
+        switch (predicate) {
+            case 'all':
+                resetPredicate();
+                this.predicate.set('all', true);
+                break;
+            case 'isVisiting':
+                resetPredicate();
+                this.predicate.set('isVisiting', true);
+                break;
+            case 'isCreator':
+                resetPredicate();
+                this.predicate.set('isCreator', true);
+                break;
+        }
+    }
+
+    get axiosParams() {
+        const params = new URLSearchParams();
+        params.append('pageNumber', this.pagingParams.pageNumber.toString());
+        params.append('pageSize', this.pagingParams.pageSize.toString());
+        this.predicate.forEach((value, key) => { 
+            params.append(key, value);
+        });
+        return params;
     }
 
     get listingByDate() {
@@ -26,9 +75,9 @@ export default class ListingStore {
     
     get groupedListings() {
         return Object.entries(
-            this.listingByCity.reduce((listings, listing) => {
-                const city = listing.city;
-                listings[city] = listings[city] ? [...listings[city], listing] : [listing];
+            this.listingByDate.reduce((listings, listing) => {
+                const dateTime = listing.dateTime!.toISOString().split('T')[0];
+                listings[dateTime] = listings[dateTime] ? [...listings[dateTime], listing] : [listing];
                 return listings;
             }, {} as {[key: string]: Listing[]})
         )
@@ -37,16 +86,20 @@ export default class ListingStore {
     loadListings = async () => {
         this.loadingInitial = true;
         try {
-            const listings = await agent.Listings.list();
-            listings.forEach(listing => {
+            const result = await agent.Listings.list(this.axiosParams);
+            result.data.forEach(listing => {
                 this.setListing(listing);
             })
+            this.setPagination(result.pagination);
             this.setLoadingInitial(false);
         } catch (error) {
             console.log(error);
-
             this.setLoadingInitial(false);        
         }
+    }
+
+    setPagination = (pagination: Pagination) => {
+        this.pagination = pagination;
     }
 
     loadListing = async (id: string) => {
@@ -190,4 +243,36 @@ export default class ListingStore {
     clearSelectedListing = () => {
         this.selectedListing = undefined;
     }
+
+    updateVisitorFollowing = (username: string) => {
+        this.listingRegistry.forEach(listing => {
+            listing.visitors.forEach((visitor: Profile) => {
+                if (visitor.username === username) {
+                    visitor.following ? visitor.followersCount-- : visitor.followersCount++;
+                    visitor.following = !visitor.following;
+                }
+            })
+        })
+    }
+
+    updateProfileDisplayName = (profile: Partial<Profile>) => {
+        this.listingRegistry.forEach(listing => {
+            listing.visitors.forEach(visitor => {
+                if (profile.displayName &&
+                    visitor.username === store.userStore.user?.username &&
+                    visitor.displayName !== profile.displayName) {
+                    visitor.displayName = profile.displayName;
+                    visitor.bio = profile.bio;
+                };
+            });
+            if (profile.displayName &&
+                    listing.creator?.username === store.userStore.user?.username &&
+                    listing.creator?.displayName !== profile.displayName)
+                {
+                    listing.creator!.displayName = profile.displayName;
+                    listing.creator!.bio = profile.bio;
+                }
+        })
+    }
+
 }

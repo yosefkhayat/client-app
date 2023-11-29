@@ -30,8 +30,8 @@ export class ListingFormValues {
     city: string = '';
     region: string = '';
     postalCode: string = '';
-    price: number = 0;
-    area: number = 0;
+    price: number | undefined ;
+    area: number | undefined ;
     dateTime: Date | null = null;
     description: string = '';
 

@@ -9,6 +9,12 @@ interface Props {
 }
 
 export default observer(function ListingListItemVisitor({ visitors }: Props) {
+
+    const styles = { 
+        borderColor: 'teal',
+        borderWidth:3
+    }
+
     return (
         <List horizontal>
             {visitors.map(visitor => (
@@ -17,7 +23,12 @@ export default observer(function ListingListItemVisitor({ visitors }: Props) {
                     key={visitor.username}
                     trigger={
                         <List.Item key={visitor.username} as={Link} to={`/profiles/${visitor.username}`}>
-                            <Image size='mini' circular src={visitor.image || '/assets/user.png'} />
+                            <Image
+                                bordered
+                                style={visitor.following ? styles : null}
+                                size='mini'
+                                circular
+                                src={visitor.image || '/assets/user.png'} />
                         </List.Item>
                     }
                 >
