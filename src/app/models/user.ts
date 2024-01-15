@@ -3,6 +3,8 @@
     token: string;
     username: string;
     image?: string;
+    roles: string[];
+    email?: string;
 }
 
 export interface UserFormValues {

@@ -9,7 +9,7 @@ interface Props {
     listing: Listing;
 }
 
-export default observer(function ActivityDetailedSidebar({ listing: { visitors, creator } }: Props) {
+export default observer(function ListingDetailedSidebar({ listing: { visitors, creator } }: Props) {
     if (!visitors) return null;
     return (
         <>

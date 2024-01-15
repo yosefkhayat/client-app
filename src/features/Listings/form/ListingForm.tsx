@@ -83,7 +83,7 @@ export default observer(function ListingForm() {
                             loading={isSubmitting}
                             floated='right'
                             positive type='submit' content='Submit' />
-                        <Button as={Link} to='/listings' floated='right' tyoe='button' content='Cancel' />
+                        <Button as={Link} to='/listings' floated='right' type='button' content='Cancel' />
                     </Form>
                 )}
             </Formik>

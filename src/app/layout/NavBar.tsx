@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Button, Icon, Menu, Image, Dropdown} from 'semantic-ui-react';
+import { Button, Icon, Menu, Image, Dropdown, Container} from 'semantic-ui-react';
 import { Link, NavLink } from 'react-router-dom';
 import { useStore } from '../stores/store';
 import { observer } from 'mobx-react-lite';
@@ -10,7 +10,9 @@ export default observer( function NavBar() {
     const { userStore: { user, logout } } = useStore();
 
     return (
-        <Menu inverted size='small' fixed='top' > 
+        <Menu inverted size='small' fixed='top' >
+
+            
             <Menu.Item as={NavLink} to='/' exact header>
                 <Icon name='new pied piper' circular inverted size='big' />
                 Nadlan
@@ -19,11 +21,22 @@ export default observer( function NavBar() {
                 as={NavLink} to='/listings'
                 name='Listings'
             />
-            <Menu.Item
-                as={NavLink} to='/errors'
-                name='Errors'
-            />cd c
-            <Menu.Item>
+            {
+                user?.roles.includes("Admin") && (
+                    <>
+                        <Menu.Item
+                            as={NavLink} to='/errors'
+                            name='Errors'
+                        />
+                        <Menu.Item
+                            as={NavLink} to='/management'
+                            name='User Management'
+                        />
+                    </>
+                    
+            )}
+
+            <Menu.Item >
                 <Button as={NavLink} to='/createListing' primary content='Create Listing' />
             </Menu.Item>
             <Menu.Item position='right'>
@@ -37,7 +50,7 @@ export default observer( function NavBar() {
                     
                 </Dropdown>
             </Menu.Item>
-
+            
             
         </Menu>
     )

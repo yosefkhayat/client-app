@@ -1,9 +1,11 @@
-﻿import React from 'react';
+﻿import React, { SyntheticEvent, useState } from 'react';
 import { Button, Icon, Item, Label, Segment } from 'semantic-ui-react';
 import { Listing } from '../../../app/models/listing';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import logo from './image.png';
 import ListingListItemVisitor from './ListingListItemVisitor';
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
 
 interface Props {
@@ -11,8 +13,17 @@ interface Props {
 }
 
 
-export default function ListingListItem({ listing }: Props) {
+export default observer( function ListingListItem({ listing }: Props) {
+    const { listingStore: { deleteListing, loading }, userStore: { user } } = useStore();
 
+    const history = useHistory();
+    const [target, setTarget] = useState('');
+
+    function handleDeleteSubmit(e: SyntheticEvent<HTMLButtonElement>, id: string) {
+        setTarget(e.currentTarget.name);
+        deleteListing(id).then(() => history.push(`/listings/`))
+
+    }
     return (
         <Segment.Group>
             <Segment>
@@ -61,6 +72,21 @@ export default function ListingListItem({ listing }: Props) {
                 <ListingListItemVisitor visitors={listing.visitors!} />
             </Segment>
             <Segment clearing>
+                {
+                    user?.roles.includes("Admin") && (
+                        <>
+                            <Button
+                                name={listing.id}
+                                floated='right'
+                                color='red'
+                                content='Delete Listing'
+                                onClick={(e) => handleDeleteSubmit(e, listing.id)}
+                                loading={loading && target === listing.id}
+
+                            />
+                        </>
+
+                    )}
                 
                 <Button
                     as={Link}
@@ -72,4 +98,4 @@ export default function ListingListItem({ listing }: Props) {
             </Segment>
         </Segment.Group>
     )
-}
+})

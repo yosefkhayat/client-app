@@ -10,7 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 interface Props{
     listingId: string;
 }
-export default observer(function ActivityDetailedChat({ listingId }: Props) {
+export default observer(function ListingDetailedChat({ listingId }: Props) {
     const { commentStore } = useStore();
 
     useEffect(() => {

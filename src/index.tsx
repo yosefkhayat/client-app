@@ -9,6 +9,7 @@ import { StoreContext, store } from './app/stores/store';
 import { Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import 'react-datepicker/dist/react-datepicker.css'
+import ScrollToTop from './app/layout/ScrollToTop';
 
 export const history = createBrowserHistory();
 
@@ -18,7 +19,8 @@ const root = ReactDOM.createRoot(
 root.render(
     <StoreContext.Provider value={store}>
 
-            <Router history={history}>
+        <Router history={history}>
+            <ScrollToTop />
                 <App />  
             </Router>
         

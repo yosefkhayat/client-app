@@ -275,4 +275,11 @@ export default class ListingStore {
         })
     }
 
+
+    reset = () => {
+        this.listingRegistry.clear();
+        this.clearSelectedListing();
+
+    }
+
 }

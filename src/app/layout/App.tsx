@@ -16,6 +16,8 @@ import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
 import ProfilePage from '../../features/profiles/ProfilePage';
+import UserManagement from '../../features/management/UserManagement';
+import PrivateRoute from './PrivateRoute';
 
 
 function App() {
@@ -44,13 +46,14 @@ function App() {
                         <NavBar />
                         <Container style={{ marginTop: '7em' }} >
                             <Switch>
-                                <Route exact path='/listings' component={ListingDashboard} />
-                                <Route path='/listings/:id' component={ListingDetails} />
-                                <Route key={location.key} path={['/createListing', '/manage/:id']} component={ListingForm} />
-                                <Route path='/profiles/:username' component={ProfilePage} />
-                                <Route path='/errors' component={TestErrors} />
+                                <PrivateRoute exact path='/listings' component={ListingDashboard} />
+                                <PrivateRoute path='/listings/:id' component={ListingDetails} />
+                                <PrivateRoute key={location.key} path={['/createListing', '/manage/:id']} component={ListingForm} />
+                                <PrivateRoute path='/profiles/:username' component={ProfilePage} />
+                                <PrivateRoute path='/errors' component={TestErrors} />
                                 <Route path='/server-error' component={ServerError} />
                                 <Route path='/login' component={LoginForm} />
+                                <PrivateRoute path='/management' component={UserManagement}/>
                                 <Route component={NotFound} />
                             </Switch>
                         </Container>

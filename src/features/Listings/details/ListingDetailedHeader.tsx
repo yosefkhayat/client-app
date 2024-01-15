@@ -23,7 +23,7 @@ interface Props {
     listing: Listing
 }
 
-export default observer(function ActivityDetailedHeader({ listing }: Props) {
+export default observer(function ListingDetailedHeader({ listing }: Props) {
     const { listingStore: { updateVisitor, loading,cancelVisitaionToggle } } = useStore();
     return (
         <Segment.Group>
